@@ -1,0 +1,15 @@
+#include "../inc/libmx.h"
+
+char *mx_strtrim(const char *str)
+{
+	int len = 0;
+    char *new = NULL;
+    while (mx_isspace(*str))
+        str++;
+    len = mx_strlen(str);
+    while (mx_isspace(str[len - 1]))
+        len--;
+    new = mx_strnew(len);
+    mx_strncpy(new, str, len);
+    return (char *)new;
+}

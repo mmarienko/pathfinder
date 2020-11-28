@@ -1,29 +1,29 @@
 SRC = src/*.c
 INC = inc/*.h
 OBJ = obj/*.o
-
 LIB = libmx.a
 FOLDER = obj
-
-CLANG = clang -std=c11 -Wall -Wextra -Werror -Wpedantic
-RM = rm -rf
+RM_FLAG = -rf
 
 all: LIBMX
 
 LIBMX:
-	mkdir $(FOLDER)
-	$(CLANG) -c $(SRC) -I $(INC)
-	mv *.o $(FOLDER)
-	ar -crs $(LIB) $(OBJ)
-	ranlib $(LIB)
+	@echo "make: compile libmx"
+	@mkdir $(FOLDER)
+	@clang -std=c11 -Wall -Wextra -Werror -Wpedantic -c $(SRC) -I $(INC)
+	@mv *.o $(FOLDER)
+	@ar -crs $(LIB) $(OBJ)
+	@ranlib $(LIB)
 
 uninstall:
-	$(RM) $(FOLDER)
-	$(RM) $(LIB)
+	@echo "make: remove libmx"
+	@rm $(RM_FLAG) $(FOLDER)
+	@rm $(RM_FLAG) $(LIB)
 
 clean:
-	$(RM) $(FOLDER)
+	@echo "make: clean libmx"
+	@rm $(RM_FLAG) $(FOLDER)
 
 reinstall:
-	make uninstall
-	make
+	@make uninstall
+	@make

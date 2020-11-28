@@ -1,5 +1,4 @@
-#ifndef LIBMX_H
-#define LIBMX_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -22,12 +21,6 @@ void mx_foreach(int *, int, void (*)(int));
 int mx_binary_search(char **, int, const char *, int *);
 int mx_bubble_sort(char **, int);
 int mx_quicksort(char **, int, int);
-void mx_stderr(const char *error);
-bool mx_isdigit(int c);
-int mx_atoi(const char *str);
-int mx_open_file(const char *filename);
-void mx_free_int_matrix(int **matrix, size_t n);
-void mx_free_char_matrix(char **matrix, size_t n);
 
 //String pack
 int mx_strlen(const char *);
@@ -74,14 +67,6 @@ typedef struct s_list
     struct s_list *next;
 } t_list;
 
-typedef struct s_c_node
-{
-    void *src;
-    void *dest;
-    void *weight;
-    struct s_c_node *next;
-} t_c_node;
-
 t_list *mx_create_node(void *);
 int mx_list_size(t_list *);
 void mx_pop_back(t_list **);
@@ -90,16 +75,13 @@ void mx_push_back(t_list **, void *);
 void mx_push_front(t_list **, void *);
 t_list *mx_sort_list(t_list *, bool (*)(void *, void *));
 
-t_c_node *mx_c_create_node(void *src, void *dest, void *weight);
-int mx_c_list_size(t_c_node *list);
-void mx_c_pop_back(t_c_node **list);
-void mx_c_pop_front(t_c_node **list);
-void mx_c_push_back(t_c_node **list, void *src, void *dest, void *weight);
-void mx_c_push_front(t_c_node **list, void *src, void *dest, void *weight);
-t_c_node *mx_sort_c_list(t_c_node *, bool (*)(void *, void *));
-
 // Utils
 bool mx_isspace(char);
+size_t mx_atoi(const char *);
+bool mx_isalpha(const char);
+bool mx_isdigit(const char);
+bool mx_islower(int);
+bool mx_isupper(int);
 char *mx_strchr(const char *, int);
+void mx_printerr(const char *);
 
-#endif

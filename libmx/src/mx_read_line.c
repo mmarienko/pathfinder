@@ -1,25 +1,41 @@
 #include "../inc/libmx.h"
 
 int mx_read_line(char **lineptr, size_t buf_size, char delim, const int fd) {
-    if (fd < 0) return -2;
-    char *line = *lineptr;
-    char buf[1];
-    if (buf_size >= 65535) return -2;
-    buf_size = 1;
-    int k = 0;
-    int i = 0;
-    int n = read(fd, buf, buf_size);
-    if (n == 0) return -1;
-    while (n != 0) {
-        if (buf[0] == delim) {
-            line[i] = '\0';
-            return k;
-        }
-        line[i++] = buf[0];
-        k++;
-        n = read(fd, buf, buf_size);
-        if (n == -1) return -2;
+    if (buf_size < 0 || fd < 0)
+        return -2;
+
+    (*lineptr) = (char *) mx_realloc(*lineptr, buf_size);
+    mx_memset((*lineptr), '\0', malloc_size((*lineptr)));
+    size_t bytes = 0;
+    char buf;
+
+    if (read(fd, &buf, 1)) {
+        if (buf == delim)
+            return bytes;
+
+        (*lineptr) = (char *) mx_realloc(*lineptr, bytes + 1);
+        (*lineptr)[bytes] = buf;
+        bytes++;
     }
-    line[i] = '\0';
-    return k;
+    else
+        return -1;
+
+    while (read(fd, &buf, 1)) {
+        if (buf == delim)
+            break;
+        
+        if (bytes >= buf_size)
+            (*lineptr) = (char *) mx_realloc(*lineptr, bytes + 1);
+
+        (*lineptr)[bytes] = buf;
+
+        bytes++;
+    }
+
+    (*lineptr) = (char *) mx_realloc(*lineptr, bytes + 1);
+
+    size_t free_bytes = malloc_size((*lineptr)) - bytes; 
+    mx_memset(&(*lineptr)[bytes], '\0', free_bytes);
+
+    return bytes + 1;
 }

@@ -1,18 +1,23 @@
-#ifndef PATHFINDER_H
-#define PATHFINDER_H
+#pragma once
 
 #include "../libmx/inc/libmx.h"
+#include "limits.h"
 
-#include <stdio.h>
+typedef struct s_graph {
+    size_t sum;
+    size_t size;
+    bool **visited;
+    char **vertices;
+    size_t **dependences;
+} t_graph;
 
-int get_count_islands(const char *filename, int fd);
-t_c_node *get_bridges_from_file(int fd);
-char **get_islands_from_bridges(t_c_node *bridges, size_t n);
-
-int **init_w_matrix(t_c_node *bridges, char **islands, size_t n);
-int **init_h_matrix(t_c_node *bridges, char **islands, size_t n);
-bool **init_rep_matrix(size_t n);
-void init_floyds_algorithm(int **w_matrix, int **h_matrix, bool **rep_matrix, size_t n);
-void print_shortest(int **w_matrix, int **h_matrix, char **islands, bool **rep_matrix, size_t n);
-
-#endif
+t_graph *mx_create_graph(size_t);
+void mx_delete_graph(t_graph **);
+void mx_push_vertex(t_graph **, const char *);
+void mx_set_dependences(t_graph **, const char*, const char *, const char *);
+void mx_dijkstra(t_graph **, const char *);
+int mx_get_vertex_index(t_graph *, const char *);
+size_t mx_get_last_vertex_index(t_graph *);
+bool mx_check_isduplicate(t_graph *, const char *, const char *);
+bool mx_isvalid(const char *, const char *, const char *);
+bool mx_check_if_sum_is_too_big(t_graph *);

@@ -1,7 +1,9 @@
 #include "../inc/pathfinder.h"
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
         mx_printerr("usage: ");
         mx_printerr(argv[0]);
         mx_printerr(" [filename]\n");
@@ -10,7 +12,8 @@ int main(int argc, char *argv[]) {
 
     int file = open(argv[1], O_RDONLY);
 
-    if (file < 0) {
+    if (file < 0)
+    {
         close(file);
         mx_printerr("error: ");
         mx_printerr(argv[1]);
@@ -19,10 +22,13 @@ int main(int argc, char *argv[]) {
     }
 
     char *line = NULL;
-    int empty = mx_read_line(&line, 10, '\n', file); // later empty can b e removed
+    int empty = mx_read_line(&line, 10, '\n', file);
 
-    if (empty == -1) {
-        if (line) mx_strdel(&line);
+    if (empty == -1)
+    {
+        if (line)
+            mx_strdel(&line);
+
         close(file);
         mx_printerr("error: ");
         mx_printerr(argv[1]);
@@ -30,30 +36,28 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // check that number of islands are equal to this 
-    size_t size = mx_atoi(line); // inputed number of islands
+    size_t size = mx_atoi(line); 
 
-    if (size == 0) {
+    if (size == 0)
+    {
         mx_strdel(&line);
         close(file);
         mx_printerr("error: line 1 is not valid\n");
         exit(EXIT_FAILURE);
     }
 
-    t_graph *graph = mx_create_graph(size);
+    t_bridge *bridges = NULL;
 
-    if (!graph) {
-        mx_strdel(&line);
-        close(file);
-        mx_printerr("error: system error\n");
-        exit(EXIT_FAILURE);
-    }
+    char *from = NULL;
+    char *to = NULL;
+    char *distance = NULL;                                                     
 
-    size_t index = 0; // for error generator
+    size_t index = 0; 
 
-    while ((empty = mx_read_line(&line, 10, '\n', file)) != -1) {
+    while ((empty = mx_read_line(&line, 10, '\n', file)) != -1)
+    {
         if (mx_get_char_index(line, '-') == -1 || mx_get_char_index(line, ',') == -1) {
-            if (graph) mx_delete_graph(&graph);
+            if (bridges) mx_free_bridge(bridges);
             mx_strdel(&line);
             close(file);
             mx_printerr("error: line ");
@@ -62,12 +66,12 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        char *from = mx_strndup(line, mx_get_char_index(line, '-'));  // melloced
-        char *to = mx_strndup(mx_strstr(line, "-") + 1, mx_get_char_index(mx_strstr(line, "-") + 1, ','));  // melloced
-        char *distance = mx_strstr(line, ",") + 1;  // not melloced   // mx_atoi for adding to graph
+        from = mx_strndup(line, mx_get_char_index(line, '-'));
+        to = mx_strndup(mx_strstr(line, "-") + 1, mx_get_char_index(mx_strstr(line, "-") + 1, ','));
+        distance = mx_strndup(mx_strstr(line, ",") + 1, mx_get_char_index(mx_strstr(line, ",") + 1, '\n'));
 
         if (!mx_isvalid(from, to, distance)) {
-            mx_delete_graph(&graph);
+            mx_free_bridge(bridges);
             mx_strdel(&line);
             mx_strdel(&from);
             mx_strdel(&to);
@@ -81,65 +85,54 @@ int main(int argc, char *argv[]) {
         }
 
         if (mx_atoi(distance) > INT_MAX) {
-            mx_delete_graph(&graph);
+            mx_free_bridge(bridges);
             mx_printerr("error: sum of bridges lengths is too big\n");
             exit(EXIT_FAILURE);
         }
 
-        mx_push_vertex(&graph, from);
-        mx_push_vertex(&graph, to);
-        mx_set_dependences(&graph, from, to, distance);
+        mx_push_bridge_back(&bridges, from, to, distance);
 
         index++;
-
-        mx_strdel(&from);
-        mx_strdel(&to);
     }
 
-    // if (mx_get_last_vertex_index(graph) != graph->size) {
-    //     mx_delete_graph(&graph);
+    // if (mx_bridge_size(bridges) != size) {
+    //     mx_free_bridge(bridges);
     //     mx_strdel(&line);
     //     close(file);
     //     mx_printerr("error: invalid number of islands\n");
     //     exit(EXIT_FAILURE);
     // }
 
-    if (mx_check_if_sum_is_too_big(graph)) {
-        mx_delete_graph(&graph);
-        mx_strdel(&line);
-        close(file);
-        mx_printerr("error: sum of bridges lengths is too big\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // ~~~~~~~~~~~~~~~ print graph ~~~~~~~~~~~~~~~ //
-
-    // mx_printstr("size: ");
-    // mx_printint(graph->size);
-    // mx_printchar('\n');
-
-    // mx_printchar('\n');
-    // mx_print_strarr(graph->vertices, " | ");
-    // mx_printchar('\n');
-
-    // for (size_t i = 0; i < graph->size; i++) {
-    //     for (size_t j = 0; j < graph->size; j++) {
-    //         mx_printchar('[');
-    //         mx_printint(graph->dependences[i][j]);
-    //         mx_printchar(']');
-    //     }
-
-    //     mx_printchar('\n');
+    // if (mx_check_if_sum_is_too_big(graph)) {
+    //     mx_delete_graph(&graph);
+    //     mx_strdel(&line);
+    //     close(file);
+    //     mx_printerr("error: sum of bridges lengths is too big\n");
+    //     exit(EXIT_FAILURE);
     // }
 
-    // mx_printchar('\n');
+    char **islands = init_islands(bridges, size);
+    int **matrix = init_matrix(bridges, islands, size);
 
-    // ~~~~~~~~~~~~~~~ print graph ~~~~~~~~~~~~~~~ //
+    printf("        ");
 
-    for (size_t i = 0; i < graph->size; i++)
-        mx_dijkstra(&graph, graph->vertices[i]); 
+    for (size_t i = 0; i < size; i++)
+    {
+        printf("%8s", islands[i]);
+    }
+    printf("\n\n");
 
-    mx_delete_graph(&graph);
+    for (size_t i = 0; i < size; i++)
+    {
+        printf("%8s", islands[i]);
+        for (size_t j = 0; j < size; j++)
+        {
+            printf("%8d", matrix[i][j]);
+        }
+        printf("\n");
+    }
+
+    mx_free_bridge(bridges);
     mx_strdel(&line);
     close(file);
 }

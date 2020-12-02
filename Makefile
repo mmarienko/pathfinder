@@ -11,7 +11,6 @@ BINARY = pathfinder
 all: PATHFINDER
 
 PATHFINDER: libmx.a
-	@echo "make: compile pathfinder"
 	@mkdir $(FOLDER)
 	@$(CLANG) -c $(SRC) -I $(INC)
 	@mv *.o $(FOLDER)
@@ -21,13 +20,11 @@ libmx.a:
 	@make -C libmx
 
 uninstall:
-	@echo "make: remove pathfinder"
 	@make uninstall -C libmx
 	@$(RM) $(FOLDER)
 	@$(RM) $(BINARY)
 
 clean:
-	@echo "make: clear pathfinder"
 	@make clean -C libmx
 	@$(RM) $(FOLDER)
 

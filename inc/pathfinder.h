@@ -3,21 +3,25 @@
 #include "../libmx/inc/libmx.h"
 #include "limits.h"
 
-typedef struct s_graph {
-    size_t sum;
-    size_t size;
-    bool **visited;
-    char **vertices;
-    size_t **dependences;
-} t_graph;
+#include "stdio.h" //debug
 
-t_graph *mx_create_graph(size_t);
-void mx_delete_graph(t_graph **);
-void mx_push_vertex(t_graph **, const char *);
-void mx_set_dependences(t_graph **, const char*, const char *, const char *);
-void mx_dijkstra(t_graph **, const char *);
-int mx_get_vertex_index(t_graph *, const char *);
-size_t mx_get_last_vertex_index(t_graph *);
-bool mx_check_isduplicate(t_graph *, const char *, const char *);
-bool mx_isvalid(const char *, const char *, const char *);
-bool mx_check_if_sum_is_too_big(t_graph *);
+typedef struct s_bridge
+{
+    void *src;
+    void *dest;
+    void *weight;
+    struct s_bridge *next;
+} t_bridge;
+
+char **init_islands(t_bridge *bridges, size_t size);
+int **init_matrix(t_bridge *bridges, char **islands, size_t size);
+bool mx_isvalid(const char *from, const char *to, const char *distance);
+
+t_bridge *mx_create_bridge(void *src, void *dest, void *weight);
+size_t mx_bridge_size(t_bridge *list);
+void mx_pop_bridge_back(t_bridge **list);
+void mx_pop_bridge_front(t_bridge **list);
+void mx_push_bridge_back(t_bridge **list, void *src, void *dest, void *weight);
+void mx_push_bridge_front(t_bridge **list, void *src, void *dest, void *weight);
+t_bridge *mx_sort_bridge(t_bridge *, bool (*)(void *, void *));
+t_bridge *mx_free_bridge(t_bridge *list);

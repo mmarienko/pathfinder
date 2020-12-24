@@ -11,24 +11,24 @@ BINARY = pathfinder
 all: PATHFINDER
 
 PATHFINDER: libmx.a
-	@mkdir $(FOLDER)
-	@$(CLANG) -c $(SRC) -I $(INC)
-	@mv *.o $(FOLDER)
-	@clang $(OBJ) libmx/$(LIB) -o $(BINARY)
+	mkdir $(FOLDER)
+	$(CLANG) -c $(SRC) -I $(INC)
+	mv *.o $(FOLDER)
+	clang $(OBJ) libmx/$(LIB) -o $(BINARY)
 
 libmx.a: 
-	@make -C libmx
+	make -C libmx
 
 uninstall:
-	@make uninstall -C libmx
-	@$(RM) $(FOLDER)
-	@$(RM) $(BINARY)
+	make uninstall -C libmx
+	$(RM) $(FOLDER)
+	$(RM) $(BINARY)
 
 clean:
-	@make clean -C libmx
-	@$(RM) $(FOLDER)
+	make clean -C libmx
+	$(RM) $(FOLDER)
 
 reinstall:
-	@make reinstall -C libmx
-	@make uninstall
-	@make
+	make reinstall -C libmx
+	make uninstall
+	make

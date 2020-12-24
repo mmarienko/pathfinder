@@ -2,3 +2,6 @@
 ._.DS_Store
 *.o
 *.out
+/obj
+example
+pathfinder

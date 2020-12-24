@@ -1,27 +1,85 @@
 #pragma once
 
 #include "../libmx/inc/libmx.h"
-#include "limits.h"
 
-#include "stdio.h" //debug
+////////
+typedef struct  mx_island {
+    int indexIsland;
+    int distTo;
+    struct mx_path *path;
+    struct mx_island *next;
+}		        t_island;
 
-typedef struct s_bridge
-{
-    void *src;
-    void *dest;
-    void *weight;
-    struct s_bridge *next;
-} t_bridge;
+typedef struct  mx_char {
+    char *p;
+    char *r;
+    char *d;
+    int s;
+}		        t_char;
 
-char **init_islands(t_bridge *bridges, size_t size);
-int **init_matrix(t_bridge *bridges, char **islands, size_t size);
-bool mx_isvalid(const char *from, const char *to, const char *distance);
+typedef struct  mx_int {
+    int size;
+    int root;
+}		        t_int;
 
-t_bridge *mx_create_bridge(void *src, void *dest, void *weight);
-size_t mx_bridge_size(t_bridge *list);
-void mx_pop_bridge_back(t_bridge **list);
-void mx_pop_bridge_front(t_bridge **list);
-void mx_push_bridge_back(t_bridge **list, void *src, void *dest, void *weight);
-void mx_push_bridge_front(t_bridge **list, void *src, void *dest, void *weight);
-t_bridge *mx_sort_bridge(t_bridge *, bool (*)(void *, void *));
-t_bridge *mx_free_bridge(t_bridge *list);
+typedef struct  mx_md {
+    int isl1;
+    int isl2;
+    int mat;
+}		        t_md;
+
+typedef struct  mx_li{
+    t_island *un;
+    t_island *v;
+    t_island *cur;
+    t_island *sh;
+}		        t_li;
+
+typedef struct  mx_path {
+    int idPath;
+    int distPath;
+    int index;
+    struct mx_path *nextConnect;
+    struct mx_path *nextPath;
+}		        t_path;
+
+
+// main
+void test_err(int argc, char *file, char **argv);
+void parsing(char *fd, int ***matrix, char ***set);
+int **create_matrix(char **set, char ***arrarr);
+void print_matrix(int **matrix, char **set);
+void algorithm(int **matrix, char **set);
+void check_spaces(char **src, char *file);
+void create_arr(char **src, char ***arrarr);
+void create_set(char ***set, char ***arrarr, char *numOfIsland);
+void delete_mat(int ***matrix, char **set);
+t_island *shortest_distance(t_island **unvisited);
+t_path *create_path(int isl, int dist);
+void path_push_back(t_path **path, t_path **previous, int isl, int dist);
+void add_link(t_path **cur, t_path **new);
+t_path *add_path(t_path **previous, int isl, int dist);
+void delete_path(t_path **head);
+t_path *copy_path(t_path **data);
+int unique_path(t_path **new, t_path **pre);
+void join(char **res, char *s2);
+void print_output(t_island **visited, int root, int size, char **set);
+void add_link(t_path **cur, t_path **new);
+t_path *add_one_path(t_path **previous, int isl, int dist);
+t_island *create_island(int isl, int dist);
+void pbi(t_island **island, t_path **path, int isl, int dist);
+void island_pop_front(t_island **head);
+void island_pop_middle(t_island **unvisited, int index);
+void sort_path(t_path **disp, int sizeP);
+int add_index_pathes(t_path **path);
+t_li *create_l();
+
+// errors //
+void err_duplicate_bridges();
+void err_file_empty(char *filename);
+void err_file_not_exist(char *filename);
+void err_first_line_invalid();
+void err_invalid_args();
+void err_invalid_line(int number_of_line);
+void err_invalid_number_of_islands();
+void err_length_of_bridges_big();
